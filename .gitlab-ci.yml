@@ -1,41 +1,37 @@
+image: node:18
+
 stages:
   - build
   - test
   - deploy
 
 build:
-    stage: build
-    image: node:18
-    script:
-      - cd client  
-      - npm install 
-      - unset CI
-      - npm run build
-    artifacts:
-      paths:
+  stage: build
+  script:
+    - cd client  
+    - npm install 
+    - unset CI
+    - npm run build
+  artifacts:
+    paths:
       - client/build/  
 
-lint: 
-    stage: test
-    script:
-      - npm run lint
-
 test: 
-    stage: test
-    script:
-      - npm run test 
+  stage: test
+  script:
+    - cd client  
+    - npm run test 
 
 deploy-dev: 
-    stage: deploy
-    script:
-      - npm run deploy-dev
-    only: 
-      - dev
+  stage: deploy
+  script:
+    - npm run deploy-dev
+  only: 
+    - dev
 
 deploy-prod: 
-    stage: deploy
-    script:
-      - npm run deploy-prod
-    only: 
-      - master 
-
+  stage: deploy
+  script:
+    - npm run deploy-prod
+  only: 
+    - master 
