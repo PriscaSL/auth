@@ -1,15 +1,13 @@
-import { BrowserRouter as Router } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
-import App from './App';
+import { MemoryRouter } from 'react-router-dom';
+import App from './App'; // Chemin vers votre composant App
 
-test('renders learn react link', () => {
+test('renders login heading', () => {
   render(
-    <Router>
+    <MemoryRouter>
       <App />
-    </Router>
+    </MemoryRouter>
   );
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const headingElement = screen.getByText(/login to your account/i);
+  expect(headingElement).toBeInTheDocument();
 });
-
-
