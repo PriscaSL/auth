@@ -1,4 +1,9 @@
-build_website:
+stages:
+  - build
+  - test
+  - deploy
+
+build:
     stage: build
     image: node:18
     script:
@@ -9,3 +14,28 @@ build_website:
     artifacts:
       paths:
       - client/build/  
+
+lint: 
+    stage: test
+    script:
+      - npm run lint
+
+test: 
+    stage: test
+    script:
+      - npm run test 
+
+deploy-dev: 
+    stage: deploy
+    script:
+      - npm run deploy-dev
+    only: 
+      - dev
+
+deploy-prod: 
+    stage: deploy
+    script:
+      - npm run deploy-prod
+    only: 
+      - master 
+
