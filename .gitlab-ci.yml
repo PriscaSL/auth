@@ -1,11 +1,11 @@
-  build_website:
+build_website:
     stage: build
     image: node:18
     script:
-    - cd client  
-    - npm install 
-    - unset CI
-    - npm run build
-  artifacts:
+      - cd client  
+      - npm install 
+      - unset CI
+      - npm run build
+    artifacts:
     paths:
-      - /client/build/  
+      - client/build/  
