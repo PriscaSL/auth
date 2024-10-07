@@ -8,4 +8,4 @@
     - npm run build
   artifacts:
     paths:
-      - client/build/  
+      - /client/build/  
