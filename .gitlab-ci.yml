@@ -16,10 +16,6 @@ build_website:
   artifacts:
     paths:
       - client/build/
-      
-deploy:
-  stage: deploy
-  only:
-    - master  
-    - echo "Deploying to AWS ECS..."
+
+
    
