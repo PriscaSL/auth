@@ -5,11 +5,13 @@ module.exports = () => {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	};
-	try {
-		mongoose.connect(process.env.DB, connectionParams);
-		console.log("Connected to database successfully");
-	} catch (error) {
-		console.log(error);
-		console.log("Could not connect database!");
-	}
+
+
+	mongoose.set('strictQuery', true);
+
+	mongoose.connect(process.env.DB, connectionParams)
+		.then(() => console.log("Connected to database successfully"))
+		.catch((error) => {
+			console.error("Could not connect to database!", error);
+		});
 };
