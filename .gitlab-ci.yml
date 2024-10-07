@@ -11,9 +11,10 @@ stages:
 build:
   stage: build
   script:
-    - cd client
-    - unset CI
-    - npm run build
+   - npm install -g react-scripts
+   - cd client
+   - npm run build
+
 
 test: 
   stage: test
