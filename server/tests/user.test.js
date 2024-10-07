@@ -8,4 +8,3 @@ describe('GET /api/users', () => {
     expect(res.body).toBeInstanceOf(Array);
   });
 });
-8
