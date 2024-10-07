@@ -2,7 +2,7 @@
     stage: build
     image: node:18
     script:
-    - cd client/  
+    - cd client  
     - npm install 
     - unset CI
     - npm run build
