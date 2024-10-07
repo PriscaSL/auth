@@ -7,5 +7,5 @@ build_website:
       - unset CI
       - npm run build
     artifacts:
-    paths:
+      paths:
       - client/build/  
