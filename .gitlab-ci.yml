@@ -11,17 +11,21 @@ stages:
 build:
   stage: build
   script:
-    - npm install -g react-scripts
+    - echo "=== Building the client ==="
     - cd client
-    - unset CI
-    - npm install react@17 react-dom@17  # Ajoutez cette ligne ici
+    - npm ci  # Utilisez npm ci pour installer les dépendances
     - npm run build
+    - echo "Build completed!"
+
 
 test:
   stage: test
   script:
+    - echo "=== Testing the client ==="
     - cd client
-    - npm run test
+    - npm ci  # Réinstaller les dépendances avant les tests
+    - npm run test -- --watchAll=false  # Exécutez les tests sans mode interactif
+
 
 deploy-dev:
   stage: deploy
