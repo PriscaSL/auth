@@ -1,11 +1,25 @@
-  build_website:
-    stage: build
-    image: node:18
-    script:
-      - cd client  
-      - npm install 
-      - unset CI
-      - npm run build
-    artifacts:
-      paths:
-        - client/build/  
+include:
+  - template: AWS/Deploy-ECS.gitlab-ci.yml  
+
+stages:
+  - build
+  - deploy
+
+build_website:
+  stage: build
+  image: node:18
+  script:
+    - cd client  
+    - npm install 
+    - unset CI
+    - npm run build
+  artifacts:
+    paths:
+      - client/build/
+
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Déploiement sur AWS ECS"
+   
