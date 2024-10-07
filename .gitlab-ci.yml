@@ -1,7 +1,7 @@
 image: node:18
 
-before_script: 
-  - npm install 
+before_script:
+  - npm ci
 
 stages:
   - build
@@ -11,27 +11,26 @@ stages:
 build:
   stage: build
   script:
-   - npm install -g react-scripts
-   - cd client
-   - unset CI
-   - npm run build
+    - npm install -g react-scripts
+    - cd client
+    - unset CI
+    - npm run build
 
-
-test: 
+test:
   stage: test
   script:
-    - npm run test 
+    - npm run test
 
-deploy-dev: 
+deploy-dev:
   stage: deploy
   script:
     - npm run deploy-dev
-  only: 
+  only:
     - dev
 
-deploy-prod: 
+deploy-prod:
   stage: deploy
   script:
     - npm run deploy-prod
-  only: 
-    - master 
+  only:
+    - master
