@@ -14,16 +14,19 @@ build:
     - npm install -g react-scripts
     - cd client
     - unset CI
+    - npm install react@17 react-dom@17  # Ajoutez cette ligne ici
     - npm run build
 
 test:
   stage: test
   script:
+    - cd client
     - npm run test
 
 deploy-dev:
   stage: deploy
   script:
+    - cd client
     - npm run deploy-dev
   only:
     - dev
@@ -31,6 +34,7 @@ deploy-dev:
 deploy-prod:
   stage: deploy
   script:
+    - cd client
     - npm run deploy-prod
   only:
     - master
