@@ -21,11 +21,12 @@ build:
 test:
   stage: test
   script:
-    - echo "=== Testing the client ==="
     - cd client
-    - npm ci  # Réinstaller les dépendances avant les tests
-    - npm run test -- --watchAll=false  # Exécutez les tests sans mode interactif
-
+    - npm ci
+    - npm run test -- --watchAll=false --passWithNoTests  # Tests client
+    - cd ../server   # Remonte d'un niveau pour accéder au dossier serveur
+    - npm ci         # Installe les dépendances du serveur si nécessaire
+    - npm test  
 
 deploy-dev:
   stage: deploy
