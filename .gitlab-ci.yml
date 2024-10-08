@@ -24,9 +24,9 @@ test:
     - npm ci
   script:
     # Tests du backend 
-    - cd server
+    - cd ../server
     - npm test
     # Tests du frontend 
-    - cd client
+    - cd ../client
     - npm test
 
