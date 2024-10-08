@@ -1,7 +1,7 @@
 stages:
   - build
   - test
-  - deploy
+
 
 build:
   stage: build
@@ -13,12 +13,21 @@ build:
     - docker build -t $CI_REGISTRY_IMAGE .
     - docker push $CI_REGISTRY_IMAGE
 
+
 test:
   stage: test
+  image: node:18
+  before_script:
+    - cd server
+    - npm ci
+    - cd client
+    - npm ci
   script:
-    - echo "Ajouter ici vos tests"
+    # Tests du backend 
+    - cd server
+    - npm test
+    # Tests du frontend 
 
-deploy:
-  stage: deploy
-  script:
-    - docker-compose up -d
+    - cd client
+    - npm test
+
