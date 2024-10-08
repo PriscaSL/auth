@@ -23,11 +23,12 @@ test:
     - name: mongo:latest  # Service MongoDB pour les tests
       alias: mongo
   script:
-    - ls -a  # Vérifie les fichiers dans le répertoire
+    - echo "=== Liste des fichiers ==="
+    - ls -a  # Affiche tous les fichiers
+    - echo "=== Vérification de l'existence de .env.test ==="
+    - if [ -f .env.test ]; then echo ".env.test existe." ; else echo ".env.test n'existe pas." ; fi
     - cp .env.test .env  # Copier le fichier .env.test comme .env
-    - echo "=== Installing dependencies ==="
     - npm install  # Installer les dépendances
-    - echo "=== Running tests ==="
     - npm test  # Exécuter les tests
   artifacts:
     when: always
