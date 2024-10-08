@@ -11,11 +11,10 @@ stages:
 build:
   stage: build
   script:
-    - echo "=== Building the client ==="
     - cd client
     - npm ci  # Utilisez npm ci pour installer les dépendances
     - npm run build
-    - echo "Build completed!"
+
 
 test:
   stage: test
@@ -23,11 +22,8 @@ test:
     - name: mongo:latest  # Service MongoDB pour les tests
       alias: mongo
   script:
-    - echo "=== Liste des fichiers ==="
-    - ls -a  # Affiche tous les fichiers
-    - echo "=== Vérification de l'existence de .env.test ==="
-    - if [ -f .env.test ]; then echo ".env.test existe." ; else echo ".env.test n'existe pas." ; fi
     - cp server/.env.test .env  # Copier le fichier .env.test comme .env
+    - cd server
     - npm install  # Installer les dépendances
     - npm test  # Exécuter les tests
   artifacts:

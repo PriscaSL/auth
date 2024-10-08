@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "start": "nodemon index.js",
-    "start:prod": "NODE_ENV=production node index.js",  
+    "start:prod": "NODE_ENV=production node index.js",
     "deploy": "cd ../client && npm run build && cd ../server && npm run start:prod"
   },
   "keywords": [],
@@ -23,6 +23,7 @@
     "mongoose": "^6.1.2"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.7"
   }
 }
