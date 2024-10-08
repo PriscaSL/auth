@@ -27,7 +27,6 @@ test:
     - cd server
     - npm test
     # Tests du frontend 
-
-    - cd client
+    - cd ../client
     - npm test
 
