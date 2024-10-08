@@ -12,26 +12,7 @@ build:
   stage: build
   script:
     - cd client
-    - npm ci  # Utilisez npm ci pour installer les dépendances
+    - npm ci  
     - npm run build
 
 
-test:
-  stage: test
-  
-
-deploy-dev:
-  stage: deploy
-  script:
-    - cd client
-    - npm run deploy-dev
-  only:
-    - dev
-
-deploy-prod:
-  stage: deploy
-  script:
-    - cd client
-    - npm run deploy-prod
-  only:
-    - master
