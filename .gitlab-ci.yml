@@ -20,7 +20,7 @@ test:
   before_script:
     - cd server
     - npm ci
-    - cd ../client
+    - cd ../client 
     - npm ci
   script:
     # Tests du backend 
