@@ -17,5 +17,22 @@ app.use(cors());
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 
-const port = process.env.PORT || 8080;
-app.listen(port, console.log(`Listening on port ${port}...`));
+
+// Route par défaut pour GET /
+app.get('/', (req, res) => {
+    res.status(200).send('Hello, world!');
+  });
+
+// Si nous ne sommes pas en mode test, démarrer le serveur
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 8080;
+  app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}...`);
+  });
+}
+
+// Exporter l'application pour les tests
+module.exports = app;
+
+
+
