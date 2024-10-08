@@ -17,16 +17,17 @@ build:
     - npm run build
     - echo "Build completed!"
 
-
-
 test:
   stage: test
   services:
     - name: mongo:latest  # Service MongoDB pour les tests
       alias: mongo
   script:
+    - ls -a  # Vérifie les fichiers dans le répertoire
     - cp .env.test .env  # Copier le fichier .env.test comme .env
+    - echo "=== Installing dependencies ==="
     - npm install  # Installer les dépendances
+    - echo "=== Running tests ==="
     - npm test  # Exécuter les tests
   artifacts:
     when: always
@@ -34,7 +35,6 @@ test:
       junit: junit.xml  # Collecter les résultats des tests
   only:
     - dev
-
 
 deploy-dev:
   stage: deploy
