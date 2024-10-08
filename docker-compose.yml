@@ -10,7 +10,7 @@ services:
     environment:
       - DB=mongodb://mongodb:27017/db
     volumes:
-      - ./server:/app # Montre le dossier local 'server' dans le conteneur
+      - ./server:/app 
 
   frontend:
     build: ./client
@@ -19,7 +19,7 @@ services:
     networks:
       - net
     volumes:
-      - ./client:/app # Montre le dossier local 'client' dans le conteneur
+      - ./client:/app 
 
   mongodb:
     image: mongo:latest

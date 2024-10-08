@@ -2,3 +2,8 @@
 
 /server/node_modules
 /server/.env
+
+
+/client/Dockerfile
+/server/Dockerfile
+/build/

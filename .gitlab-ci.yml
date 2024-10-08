@@ -1,8 +1,3 @@
-image: node:18
-
-before_script:
-  - npm ci
-
 stages:
   - build
   - test
@@ -10,9 +5,20 @@ stages:
 
 build:
   stage: build
+  image: docker
+  services:
+    - docker:dind
   script:
-    - cd client
-    - npm ci  
-    - npm run build
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin 
+    - docker build -t $CI_REGISTRY_IMAGE . 
+	  - docker push $CI_REGISTRY_IMAGE
+    
+test:
+  stage: test
+  script:
+    - echo "Ajouter ici vos tests"
 
-
+deploy:
+  stage: deploy
+  script:
+    - docker-compose up -d
