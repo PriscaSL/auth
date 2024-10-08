@@ -6,9 +6,10 @@ const dotenv = require('dotenv');
 dotenv.config({ path: '.env.test' });
 
 describe('MongoDB Connectivity', () => {
-  // Nettoyer l'état de la base de données avant chaque test si nécessaire
   beforeAll(async () => {
-    // Vous pouvez configurer des choses avant les tests ici si nécessaire
+    // Configurez l'URI de connexion valide avant de démarrer les tests
+    process.env.DB = 'mongodb://mongo:27017/db'; // Assurez-vous que l'alias est utilisé
+    await connectToDatabase(); // Connexion à la base de données
   });
 
   afterAll(async () => {
@@ -17,19 +18,19 @@ describe('MongoDB Connectivity', () => {
   });
 
   it('should connect to the database successfully', async () => {
-    await connectToDatabase(); // Appel à votre fonction de connexion MongoDB
     expect(mongoose.connection.readyState).toBe(1); // 1 signifie que MongoDB est connecté
   });
 
   it('should fail to connect to the database with invalid URI', async () => {
     const invalidUri = 'mongodb://invalidUri';
     
-    // Vous pouvez modifier temporairement la variable d'environnement pour un test d'échec
+    // Modifiez temporairement la variable d'environnement pour un test d'échec
     process.env.DB = invalidUri;
-    
+
     try {
-      await connectToDatabase();
+      await connectToDatabase(); // Essayez de vous connecter avec une URI invalide
     } catch (error) {
+      // Vérifiez que la connexion échoue
       expect(mongoose.connection.readyState).toBe(0); // 0 signifie que MongoDB n'est pas connecté
     }
   });
