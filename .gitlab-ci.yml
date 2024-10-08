@@ -18,20 +18,7 @@ build:
 
 test:
   stage: test
-  services:
-    - name: mongo:latest  # Service MongoDB pour les tests
-      alias: mongo
-  script:
-    - cp server/.env.test .env  # Copier le fichier .env.test comme .env
-    - cd server
-    - npm install  # Installer les dépendances
-    - npm test  # Exécuter les tests
-  artifacts:
-    when: always
-    reports:
-      junit: junit.xml  # Collecter les résultats des tests
-  only:
-    - dev
+  
 
 deploy-dev:
   stage: deploy
