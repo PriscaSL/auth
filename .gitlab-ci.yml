@@ -18,15 +18,23 @@ build:
     - echo "Build completed!"
 
 
+
 test:
   stage: test
+  services:
+    - name: mongo:latest  # Service MongoDB pour les tests
+      alias: mongo
   script:
-    - cd client
-    - npm ci
-    - npm run test -- --watchAll=false --passWithNoTests  # Tests client
-    - cd ../server   # Remonte d'un niveau pour accéder au dossier serveur
-    - npm ci         # Installe les dépendances du serveur si nécessaire
-    - npm test  
+    - cp .env.test .env  # Copier le fichier .env.test comme .env
+    - npm install  # Installer les dépendances
+    - npm test  # Exécuter les tests
+  artifacts:
+    when: always
+    reports:
+      junit: junit.xml  # Collecter les résultats des tests
+  only:
+    - dev
+
 
 deploy-dev:
   stage: deploy
