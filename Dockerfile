@@ -16,8 +16,8 @@ COPY server/ .
 # Copier le build du frontend dans le backend pour qu'il serve les fichiers statiques
 COPY --from=build-frontend /app/client/build ./public
 
-# Exposer le port pour le backend (8080)
-EXPOSE 8080
+# Exposer le port pour le frontend (3000)
+EXPOSE 3000
 
 # Lancer l'application backend (qui sert aussi le frontend en production)
 CMD ["npm", "start"]
