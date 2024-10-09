@@ -1,8 +1,7 @@
 stages:
   - build
   - test
-  - deploy 
-
+  - deploy
 
 build:
   stage: build
@@ -14,14 +13,13 @@ build:
     - docker build -t $CI_REGISTRY_IMAGE .
     - docker push $CI_REGISTRY_IMAGE
 
-
 test:
   stage: test
   image: node:18
   before_script:
     - cd server
     - npm ci
-    - cd ../client 
+    - cd ../client
     - npm ci
   script:
     - cd ../server
@@ -34,8 +32,9 @@ deploy-job:
   image: amazon/aws-cli:latest
   script:
     - aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION --region ap-south-1 > input.json
-    - jq '.taskDefinition.containerDefinitions[].image="'$REPOSITORY_URL':'$IMAGE_TAG'"' input.json |
+    - jq '.containerDefinitions[].image="'$CI_REGISTRY_IMAGE':'$CI_COMMIT_SHORT_SHA'"' input.json |
          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities)' > modified.json
     - aws ecs register-task-definition --cli-input-json file://modified.json --region ap-south-1
     - revision=$(aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION --region ap-south-1 | jq -r '.taskDefinition.revision')
     - aws ecs update-service --cluster $CI_AWS_ECS_CLUSTER --service $CI_AWS_ECS_SERVICE --task-definition $CI_AWS_ECS_TASK_DEFINITION:$revision --region ap-south-1
+
