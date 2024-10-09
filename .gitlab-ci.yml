@@ -37,7 +37,7 @@ test:
 
 deploy:
   stage: deploy
-  image: amazon/aws-cli:latest
+  image: amazon/aws-cli:2.9.19
   script:
     - echo "Registering new task definition..."
     - |
