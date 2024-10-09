@@ -1,7 +1,8 @@
 stages:
   - build
   - test
-  - deploy
+  - deploy 
+
 
 build:
   stage: build
@@ -12,6 +13,7 @@ build:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
     - docker build -t $CI_REGISTRY_IMAGE .
     - docker push $CI_REGISTRY_IMAGE
+
 
 test:
   stage: test
@@ -27,13 +29,13 @@ test:
     - cd ../client
     - npm test
 
-deploy:
+deploy-job:
   stage: deploy
   image: amazon/aws-cli:latest
   script:
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws configure set default.region $AWS_DEFAULT_REGION
-    - aws ecs update-service --cluster $CI_AWS_ECS_CLUSTER --service $CI_AWS_ECS_SERVICE --force-new-deployment
-  only:
-    - dev  
+    - aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION --region ap-south-1 > input.json
+    - jq '.taskDefinition.containerDefinitions[].image="'$REPOSITORY_URL':'$IMAGE_TAG'"' input.json |
+         jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities)' > modified.json
+    - aws ecs register-task-definition --cli-input-json file://modified.json --region ap-south-1
+    - revision=$(aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION --region ap-south-1 | jq -r '.taskDefinition.revision')
+    - aws ecs update-service --cluster $CI_AWS_ECS_CLUSTER --service $CI_AWS_ECS_SERVICE --task-definition $CI_AWS_ECS_TASK_DEFINITION:$revision --region ap-south-1
