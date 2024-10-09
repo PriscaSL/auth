@@ -1,2 +1,58 @@
-include:
-  - template: AWS/Deploy-ECS.gitlab-ci.yml 
+stages:
+  - build
+  - test
+  - deploy
+
+# Build Docker image and push to GitLab Container Registry
+build:
+  stage: build
+  image: docker
+  services:
+    - docker:dind
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE
+
+# Run tests for server and client
+test:
+  stage: test
+  image: node:18
+  before_script:
+    - cd server
+    - npm ci
+    - cd ../client 
+    - npm ci
+  script:
+    - cd ../server
+    - npm test
+    - cd ../client
+    - npm test
+
+# Deploy to AWS ECS
+deploy:
+  stage: deploy
+  image: amazon/aws-cli
+  environment:
+    name: production
+    url: https://your-production-url.com
+  script:
+    # Log in to AWS CLI using environment variables
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set default.region $AWS_DEFAULT_REGION
+
+    # Register new task definition (update image)
+    - >
+      export NEW_TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION)
+    - >
+      NEW_TASK_DEFINITION=$(echo "$NEW_TASK_DEFINITION" | jq --arg IMAGE "$CI_REGISTRY_IMAGE:latest" '.taskDefinition | .containerDefinitions[0].image = $IMAGE | {family: .     family, containerDefinitions: .containerDefinitions}')
+    - echo "$NEW_TASK_DEFINITION" > new-task-def.json
+    - aws ecs register-task-definition --cli-input-json file://new-task-def.json
+
+    # Update ECS service to use new task definition revision
+    - >
+      aws ecs update-service \
+        --cluster $CI_AWS_ECS_CLUSTER \
+        --service $CI_AWS_ECS_SERVICE \
+        --force-new-deployment
