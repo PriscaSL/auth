@@ -1,3 +1,10 @@
+image: docker:latest
+
+variables:
+  AWS_DEFAULT_REGION: "ap-south-1"  # Si vous ne déployez que sur GitLab, cette variable peut être omise.
+  REPOSITORY_URL: "$CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME"  # URL de votre registre GitLab
+  IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"  # Tag de l'image
+
 stages:
   - build
   - test
@@ -11,7 +18,9 @@ build:
   script:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
     - docker build -t $CI_REGISTRY_IMAGE .
-    - docker push $CI_REGISTRY_IMAGE
+    - docker tag $CI_REGISTRY_IMAGE $REPOSITORY_URL:$IMAGE_TAG
+    - echo "Pushing Docker image to GitLab Container Registry..."
+    - docker push $REPOSITORY_URL:$IMAGE_TAG
 
 test:
   stage: test
@@ -19,7 +28,7 @@ test:
   before_script:
     - cd server
     - npm ci
-    - cd ../client
+    - cd ../client 
     - npm ci
   script:
     - cd ../server
@@ -27,14 +36,23 @@ test:
     - cd ../client
     - npm test
 
-deploy-job:
+
+deploy:
   stage: deploy
   image: amazon/aws-cli:latest
   script:
-    - aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION --region ap-south-1 > input.json
-    - jq '.containerDefinitions[].image="'$CI_REGISTRY_IMAGE':'$CI_COMMIT_SHORT_SHA'"' input.json |
-         jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities)' > modified.json
-    - aws ecs register-task-definition --cli-input-json file://modified.json --region ap-south-1
-    - revision=$(aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION --region ap-south-1 | jq -r '.taskDefinition.revision')
-    - aws ecs update-service --cluster $CI_AWS_ECS_CLUSTER --service $CI_AWS_ECS_SERVICE --task-definition $CI_AWS_ECS_TASK_DEFINITION:$revision --region ap-south-1
+    - echo "Registering new task definition..."
+    - |
+      task_definition=$(aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION --region $AWS_DEFAULT_REGION)
+      image="$REPOSITORY_URL:$IMAGE_TAG"
+      updated_task_definition=$(echo "$task_definition" | sed "s|\"image\":\"[^\"]*\"|\"image\":\"$image\"|")
+      aws ecs register-task-definition --cli-input-json "$updated_task_definition" --region $AWS_DEFAULT_REGION
+    - echo "Updating ECS service..."
+    - |
+      revision_output=$(aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION --region $AWS_DEFAULT_REGION)
+      revision=$(echo "$revision_output" | grep -o '"revision": [0-9]*' | grep -o '[0-9]*')
+      revision=$(echo "$revision" | tr -d '\n')  # Enlève les nouvelles lignes
+    - echo '"Current revision:" "$revision"'
+    - aws ecs update-service --cluster $CI_AWS_ECS_CLUSTER --service $CI_AWS_ECS_SERVICE --task-definition "$CI_AWS_ECS_TASK_DEFINITION:$revision" --region $AWS_DEFAULT_REGION
+
 
