@@ -41,11 +41,11 @@ deploy:
   script:
     - echo "Registering new task definition..."
     - |
-      task_definition=$(aws ecs describe-task-definition --task-definition $CI_AWS_ECS_TASK_DEFINITION)
+      task_definition=$(aws ecs describe-task-definition --task-definition "$CI_AWS_ECS_TASK_DEFINITION" --region "$AWS_DEFAULT_REGION")
       image="$REPOSITORY_URL:$IMAGE_TAG"
       updated_task_definition=$(echo "$task_definition" | sed "s|\"image\":\"[^\"]*\"|\"image\":\"$image\"|")
-      aws ecs register-task-definition --cli-input-json "$updated_task_definition"
+      aws ecs register-task-definition --cli-input-json "$updated_task_definition" --region "$AWS_DEFAULT_REGION"
       
     - echo "Updating ECS service..."
     - |
-      aws ecs update-service --cluster $CI_AWS_ECS_CLUSTER --service $CI_AWS_ECS_SERVICE --force-new-deployment
+      aws ecs update-service --cluster "$CI_AWS_ECS_CLUSTER" --service "$CI_AWS_ECS_SERVICE" --force-new-deployment --region "$AWS_DEFAULT_REGION"
