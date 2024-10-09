@@ -23,10 +23,8 @@ test:
     - cd ../client 
     - npm ci
   script:
-    # Tests du backend 
     - cd ../server
     - npm test
-    # Tests du frontend 
     - cd ../client
     - npm test
 
