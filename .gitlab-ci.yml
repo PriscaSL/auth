@@ -1,2 +1,30 @@
-include:
-  - template: AWS/Deploy-ECS.gitlab-ci.yml 
+stages:
+  - build
+  - test
+
+
+build:
+  stage: build
+  image: docker
+  services:
+    - docker:dind
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE
+
+
+test:
+  stage: test
+  image: node:18
+  before_script:
+    - cd server
+    - npm ci
+    - cd ../client 
+    - npm ci
+  script:
+    - cd ../server
+    - npm test
+    - cd ../client
+    - npm test
+
